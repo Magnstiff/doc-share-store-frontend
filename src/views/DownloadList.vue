@@ -5,12 +5,12 @@ export default {
   name: 'DownloadList',
   components: { CloseCircleFilled },
   computed: {
-    downloadInfo () {
+    downloadInfo() {
       return this.$store.state.downloadInfo
     }
   },
   methods: {
-    cancelDownload (index) {
+    cancelDownload(index) {
       this.$store.commit('cancelDownload', index)
     }
   }
@@ -18,16 +18,18 @@ export default {
 </script>
 
 <template>
-  <a-page-header style="border: 1px solid rgb(235, 237, 240);background-color:#eee;" title="下载列表"/>
+  <a-page-header style="border: 1px solid rgb(235, 237, 240);background-color:#eee;" title="下载列表" />
   <div class="null" v-if="downloadInfo.downloadList.length === 0">无下载任务</div>
   <div class="main" v-else>
     <div v-for="(item, index) in downloadInfo.downloadList" :key="index">
-      <div class="line" v-if="index !== 0"/>
+      <div class="line" v-if="index !== 0" />
       <a-row class="main-progress">
-        <a-row>当前任务：<span style="font-weight: bold">{{item.fileName}}<span style="color: #e11;margin-left: 10px" v-if="item.status === 'canceled'">(已取消)</span></span></a-row>
+        <a-row>当前任务：<span style="font-weight: bold">{{ item.fileName }}<span style="color: #e11;margin-left: 10px"
+              v-if="item.status === 'canceled'">(已取消)</span></span></a-row>
         <div class="progress-show">
-          <a-progress :percent="item.downloadPercent"/>
-          <CloseCircleFilled v-if="item.status === 'downloading'" @click="cancelDownload(index)" style="color: red;position: relative;top: -2px"/>
+          <a-progress :percent="item.downloadPercent" />
+          <CloseCircleFilled v-if="item.status === 'downloading'" @click="cancelDownload(index)"
+            style="color: red;position: relative;top: -2px" />
         </div>
         <a-row>
           <a-col>进度： {{ item.downloadedSize }} / {{ item.fileSize }}</a-col>
