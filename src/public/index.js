@@ -10,7 +10,7 @@ export function parseMemorySize (size) {
   if (isNaN(size)) {
     return '0B'
   }
-  return size.toFixed(2) + list[count]
+  return size.toFixed(1) + list[count]
 }
 
 export async function solveDownloadList (info) {
