@@ -1,6 +1,7 @@
 <script>
 import { HomeOutlined, DownloadOutlined, EyeOutlined } from '@ant-design/icons-vue'
 import FileName from '../components/FilesView/FileName.vue'
+import show from "../components/notification.js"
 
 export default {
   name: 'FilesView',
@@ -45,20 +46,29 @@ export default {
     singleClick(val) {
       this.curFileName = val.name
     },
-    doubleClick(isFolder, fileName) {
-      if (isFolder) {
-        this.currentPath = this.currentPath + val.name + '/'
+    doubleClick(val) {
+      if (val.isFolder) {
+        this.currentPath = this.currentPath + val.fileName + '/'
         return
       }
-      this.previewFile(fileName)
+      this.previewFile(val.fileName)
     },
     // 获取文件列表
     async getFileList() {
       this.tableLoading = true
       this.selectedRowKeys = []
       await this.$axios.get(`/file?filePath=${this.currentPath}`).then(res => {
+        // 按照文件夹在上，文件在下的顺序排列，然后按照文件名排序
+        res.data.sort((a, b) => {
+          if (a.isFolder === b.isFolder) {
+            return a.fileName.localeCompare(b.fileName)
+          }
+          return a.isFolder ? -1 : 1
+        })
         this.filesData = res.data
-      }).then(() => {
+      }).catch(() => {
+        show('error', '获取文件列表失败，错误信息：' + err)
+      }).finally(() => {
         this.tableLoading = false
       })
     },
@@ -92,12 +102,15 @@ export default {
     // 下载文件
     downloadFile(target) {
       const paths = target.map(item => this.filesData.find(file => file.fileName === item))
-      this.$store.commit('downloadFile', paths, this.currentPath)
+      this.$store.dispatch('downloadFile', { paths: paths, basePath: this.currentPath })
       // this.$router.push('/download')
     },
     // 上传文件
     uploadFile(event) {
-      this.$store.commit('uploadFile', this.currentPath)
+      this.$store.dispatch('uploadFile', this.currentPath).then((name) => {
+        this.getFileList()
+        this.$router.push('/download')
+      })
     },
   },
   mounted() {
