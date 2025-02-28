@@ -14,7 +14,7 @@ export default {
         download: {
           key: 'download',
           icon: 'CloudDownloadOutlined',
-          name: '下载列表'
+          name: '任务列表'
         },
         preview: {
           key: 'preview',
