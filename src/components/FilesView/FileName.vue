@@ -1,11 +1,12 @@
 <script>
 import {
+  GithubOutlined,
   FolderOutlined, SoundOutlined, FileExcelOutlined, FileWordOutlined, FilePptOutlined, FileTextOutlined, FilePdfOutlined, FileZipOutlined, FileImageOutlined, FileGifOutlined, AndroidOutlined, WindowsOutlined, VideoCameraOutlined, FileUnknownOutlined
 } from '@ant-design/icons-vue'
 
 export default {
   name: 'FileName',
-  components: { FolderOutlined, SoundOutlined, FileExcelOutlined, FileWordOutlined, FilePptOutlined, FileTextOutlined, FilePdfOutlined, FileZipOutlined, FileImageOutlined, FileGifOutlined, AndroidOutlined, WindowsOutlined, VideoCameraOutlined, FileUnknownOutlined },
+  components: { GithubOutlined, FolderOutlined, SoundOutlined, FileExcelOutlined, FileWordOutlined, FilePptOutlined, FileTextOutlined, FilePdfOutlined, FileZipOutlined, FileImageOutlined, FileGifOutlined, AndroidOutlined, WindowsOutlined, VideoCameraOutlined, FileUnknownOutlined },
   props: {
     fileName: {
       type: String,
@@ -17,8 +18,36 @@ export default {
     }
   },
   computed: {
-    fileType () {
-      return this.isFolder ? 'folder' : this.fileName.substring(this.fileName.lastIndexOf('.') + 1, this.fileName.length).toLowerCase()
+    fileType() {
+      if (!this.isFolder) return this.fileName.substring(this.fileName.lastIndexOf('.') + 1, this.fileName.length).toLowerCase()
+      if (this.fileName.endsWith('.git')) return 'git'
+      return 'folder'
+    },
+    iconType() {
+      for (const [icon, types] of Object.entries(this.typeMap)) {
+        if (types.includes(this.fileType)) return icon
+      }
+      return 'FileUnknownOutlined'
+    }
+  },
+  data() {
+    return {
+      typeMap: {
+        'FolderOutlined': ['folder'],
+        'SoundOutlined': ['mp3', 'wma', 'wav', 'ape', 'flac', 'ogg', 'acc'],
+        'FileExcelOutlined': ['xls', 'xlsx'],
+        'FileWordOutlined': ['doc', 'docx'],
+        'FilePptOutlined': ['ppt', 'pptx'],
+        'FilePdfOutlined': ['pdf'],
+        'FileTextOutlined': ['txt'],
+        'FileZipOutlined': ['zip', '7z', 'rar', 'wim'],
+        'FileImageOutlined': ['bmp', 'jpeg', 'png', 'svg', 'psd', 'jpg'],
+        'FileGifOutlined': ['gif'],
+        'WindowsOutlined': ['exe'],
+        'AndroidOutlined': ['apk'],
+        'VideoCameraOutlined': ['mp4', 'avi', 'dat', 'flv', 'm4v', 'wmv', 'asf', 'mkv', 'mpeg'],
+        'GithubOutlined': ['git']
+      }
     }
   }
 }
@@ -27,22 +56,9 @@ export default {
 <template>
   <div>
     <span class="svg">
-      <FolderOutlined v-if="fileType === 'folder'"/>
-      <SoundOutlined v-else-if="fileType === 'mp3' || fileType === 'wma' || fileType === 'wav' || fileType === 'ape' || fileType === 'flac' || fileType === 'ogg' || fileType === 'acc'"/>
-      <FileExcelOutlined v-else-if="fileType === 'xls' || fileType === 'xlsx'"/>
-      <FileWordOutlined v-else-if="fileType === 'doc' || fileType === 'docx'"/>
-      <FilePptOutlined v-else-if="fileType === 'ppt' || fileType === 'pptx'"/>
-      <FilePdfOutlined v-else-if="fileType === 'pdf'"/>
-      <FileTextOutlined v-else-if="fileType === 'txt'"/>
-      <FileZipOutlined v-else-if="fileType === 'zip' || fileType === '7z' || fileType === 'rar' || fileType === 'wim'"/>
-      <FileImageOutlined v-else-if="fileType === 'bmp' || fileType === 'jpeg' || fileType === 'png' || fileType === 'svg' || fileType === 'psd' || fileType === 'jpg'"/>
-      <FileGifOutlined v-else-if="fileType === 'gif'"/>
-      <WindowsOutlined v-else-if="fileType === 'exe'"/>
-      <AndroidOutlined v-else-if="fileType === 'apk'"/>
-      <VideoCameraOutlined v-else-if="fileType === 'mp4' || fileType === 'avi' || fileType === 'dat' || fileType === 'flv' || fileType === 'm4v' || fileType === 'wmv' || fileType === 'asf' || fileType === 'mkv' || fileType === 'mpeg'"/>
-      <FileUnknownOutlined v-else/>
+      <component :is="iconType" />
     </span>
-    <span>{{fileName}}</span>
+    <span>{{ fileName }}</span>
   </div>
 </template>
 

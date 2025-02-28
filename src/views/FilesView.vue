@@ -37,12 +37,22 @@ export default {
     }
   },
   methods: {
+    // 选择文件
     onSelectChange(selectedRowKeys) {
       this.selectedRowKeys = selectedRowKeys
     },
+    // 单击和双击事件
     singleClick(val) {
       this.curFileName = val.name
     },
+    doubleClick(isFolder, fileName) {
+      if (isFolder) {
+        this.currentPath = this.currentPath + val.name + '/'
+        return
+      }
+      this.previewFile(fileName)
+    },
+    // 获取文件列表
     async getFileList() {
       this.tableLoading = true
       this.selectedRowKeys = []
@@ -52,18 +62,13 @@ export default {
         this.tableLoading = false
       })
     },
-    openFolderOrFile(val) {
-      if (val.isFolder) {
-        this.currentPath = this.currentPath + val.name + '/'
-      } else {
-        this.previewFile(val.name)
-      }
-    },
+    // 返回上一级
     goBack() {
       let currentPath = this.currentPath.substring(0, this.currentPath.length - 1)
       currentPath = currentPath.substring(0, currentPath.lastIndexOf('/') + 1)
       this.currentPath = currentPath
     },
+    // 跳转到指定路径
     goToTargetPath(index) {
       if (index === -1) {
         this.currentPath = '/'
@@ -75,32 +80,25 @@ export default {
       }
       this.currentPath = currentPath
     },
-    previewFile(target) {
+    // 预览文件
+    previewFile(fileName) {
       this.$router.push({
         name: 'preview',
         query: {
-          previewPath: `${this.currentPath}${target}`
+          previewPath: `${this.currentPath}${fileName}`
         }
       })
-      this.$store.commit('setPreviewPath', `${this.currentPath}${target}`)
     },
-    async downloadFile(target) {
-      if (target === undefined) {
-        target = []
-        this.selectedRowKeys.forEach(item => {
-          this.filesData.forEach((val) => {
-            if (val.fileName.name === item) {
-              target.push({ name: val.fileName.name, isFolder: val.fileName.isFolder })
-            }
-          })
-        })
-      }
-      this.$store.commit('downloadFile', {
-        files: target,
-        filePath: this.currentPath
-      })
-      this.$router.push('/download')
-    }
+    // 下载文件
+    downloadFile(target) {
+      const paths = target.map(item => this.filesData.find(file => file.fileName === item))
+      this.$store.commit('downloadFile', paths, this.currentPath)
+      // this.$router.push('/download')
+    },
+    // 上传文件
+    uploadFile(event) {
+      this.$store.commit('uploadFile', this.currentPath)
+    },
   },
   mounted() {
     this.getFileList()
@@ -122,9 +120,11 @@ export default {
   <a-page-header style="border: 1px solid rgb(235, 237, 240);background-color:#eee;" title="文件库" />
   <a-row class="main">
     <a-row class="main-opera">
-      <a-button type="primary" class="opera-button" :disabled="selectedRowKeys.length === 0" @click="downloadFile()">
+      <a-button type="primary" class="opera-button" :disabled="selectedRowKeys.length === 0"
+        @click="downloadFile(selectedRowKeys)">
         下载
       </a-button>
+      <a-button type="default" class="opera-button" @click="uploadFile">上传</a-button>
       <a-button type="default" class="opera-button" @click="getFileList">刷新</a-button>
     </a-row>
     <a-row class="main-bread">
@@ -145,20 +145,18 @@ export default {
     <a-row class="main-table">
       <a-table :data-source="filesData" :columns="column" style="width: 100%" class="table"
         :row-selection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
-        :row-key="record => record.fileName.name" :custom-row="data => ({
-          onDblclick: () => openFolderOrFile(data.fileName),
-          onClick: () => singleClick(data.fileName)
-        })" :row-class-name="(_record) => (curFileName === _record.fileName.name ? 'selected' : null)"
+        :row-key="record => record.fileName" :custom-row="data => ({
+          onDblclick: () => doubleClick(data),
+          onClick: () => singleClick(data)
+        })" :row-class-name="(_record) => (curFileName === _record.fileName ? 'selected' : null)"
         :loading="tableLoading">
         <template #bodyCell="{ record, column }">
           <FileName v-if="column.title === '文件名'" :file-name="record.fileName" :is-folder="record.isFolder" />
           <span v-else-if="column.title === '文件大小'">{{ record.fileSize }}</span>
           <template v-else-if="column.title === '操作'">
-            <DownloadOutlined class="opera-icons" title="下载"
-              @click.prevent="downloadFile([{ name: record.fileName, isFolder: false }])"
-              v-if="!record.fileName.isFolder" />
-            <EyeOutlined class="opera-icons" title="预览" @click.prevent="previewFile(record.fileName.name)"
-              v-if="!record.fileName.isFolder" />
+            <DownloadOutlined class="opera-icons" title="下载" @click.prevent="downloadFile([record.fileName])" />
+            <EyeOutlined class="opera-icons" title="预览" @click.prevent="previewFile(record.fileName)"
+              v-if="!record.isFolder" />
           </template>
         </template>
       </a-table>
