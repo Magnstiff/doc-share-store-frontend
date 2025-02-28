@@ -2,8 +2,19 @@
 export default {
   name: 'MusicViewer',
   props: ['url'],
+  inject: ['$axios'],
+  data() {
+    return {
+      content: ''
+    }
+  },
+  beforeMount() {
+    this.$axios.get(this.url, { responseType: 'blob' }).then(res => {
+      this.content = URL.createObjectURL(res.data)
+    })
+  },
   computed: {
-    getMusicName () {
+    getMusicName() {
       if (this.url) {
         const arr = this.url.split('/')
         return arr[arr.length - 1]
@@ -18,7 +29,7 @@ export default {
   <div class="main">
     <div class="player">
       <div class="name">当前播放：{{ getMusicName }}</div>
-      <audio :src="url" controls class="music"></audio>
+      <audio :src="content" controls class="music"></audio>
     </div>
   </div>
 </template>

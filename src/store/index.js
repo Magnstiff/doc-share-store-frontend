@@ -1,9 +1,9 @@
 import { createStore } from 'vuex'
 import axios from '@/axios/index.js'
-import { stringToSize, sizeToString } from '../common/index.js'
+import { stringToSize } from '../common/index.js'
 import { saveAs } from 'file-saver'
 import show from '@/components/notification.js'
-import JSZip, { file } from 'jszip'
+import JSZip from 'jszip'
 import { v4 } from 'uuid'
 
 export default createStore({

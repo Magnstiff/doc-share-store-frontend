@@ -2,9 +2,11 @@
 export default {
   name: 'PictureViewer',
   props: ['url'],
-  data () {
+  inject: ['$axios'],
+  data() {
     return {
-      scale: 1,
+      content: '',
+      scale: 0.5,
       drag: {
         onDrag: false,
         startX: 0,
@@ -12,9 +14,18 @@ export default {
       }
     }
   },
+  beforeMount() {
+    this.$axios.get(this.url, { responseType: 'blob' }).then(res => {
+      const reader = new FileReader()
+      reader.readAsDataURL(res.data)
+      reader.onload = () => {
+        this.content = reader.result
+      }
+    })
+  },
   methods: {
-    handleWheel (e) {
-      // 在鼠标位置缩放
+    // 在鼠标位置缩放
+    handleWheel(e) {
       const x = e.clientX
       const y = e.clientY
       const imgX = this.$refs.img.offsetLeft
@@ -28,20 +39,22 @@ export default {
         this.scaleUp(0.05)
       }
     },
-    scaleUp (val) {
+    // 放大和缩小
+    scaleUp(val) {
       if (this.scale >= 2) return
       this.scale += val
     },
-    scaleDown (val) {
+    scaleDown(val) {
       if (this.scale <= 0.2) return
       this.scale -= val
     },
-    handleMouseDown (e) {
+    // 拖拽
+    handleMouseDown(e) {
       this.drag.onDrag = true
       this.drag.startX = e.clientX
       this.drag.startY = e.clientY
     },
-    handleMouseMove (e) {
+    handleMouseMove(e) {
       if (!this.drag.onDrag) return
       const x = e.clientX
       const y = e.clientY
@@ -52,10 +65,10 @@ export default {
       this.$refs.img.style.left = `${this.$refs.img.offsetLeft + diffX}px`
       this.$refs.img.style.top = `${this.$refs.img.offsetTop + diffY}px`
     },
-    handleMouseUp () {
+    handleMouseUp() {
       this.drag.onDrag = false
     },
-    handleMouseLeave () {
+    handleMouseLeave() {
       this.drag.onDrag = false
     }
   }
@@ -70,7 +83,8 @@ export default {
     </div>
 
     <div class="main">
-      <img :src="url" alt="" ref="img" :style="{width: `${scale * 2000}px`}" @mousedown="handleMouseDown" @mousemove="handleMouseMove" @mouseup="handleMouseUp" @mouseleave="handleMouseLeave" draggable="false">
+      <img :src="content" alt="" ref="img" :style="{ width: `${scale * 2000}px` }" @mousedown="handleMouseDown"
+        @mousemove="handleMouseMove" @mouseup="handleMouseUp" @mouseleave="handleMouseLeave" draggable="false">
     </div>
   </div>
 </template>

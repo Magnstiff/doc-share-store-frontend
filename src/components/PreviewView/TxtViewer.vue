@@ -4,19 +4,19 @@ export default {
   name: 'TxtViewer',
   props: ['url'],
   inject: ['$axios'],
-  data () {
+  data() {
     return {
       content: ''
     }
   },
-  beforeMount () {
-    this.$axios.get(this.url.replace('/api', '')).then(res => {
+  beforeMount() {
+    this.$axios.get(this.url).then(res => {
       this.content = res.data
     })
   },
   computed: {
-    contentArray () {
-      return this.content.split('\n')
+    contentArray() {
+      return this.content.split('\n').slice(0, -1)
     }
   }
 }
@@ -25,19 +25,16 @@ export default {
 <template>
   <div class="main">
     <div class="viewer">
-
       <div class="left-bar">
         <template v-for="(item, index) in contentArray" :key="index">
           <div>{{ index + 1 }}</div>
         </template>
       </div>
-
       <div class="content">
         <template v-for="(item, index) in contentArray" :key="index">
           <div>{{ item }}</div>
         </template>
       </div>
-
     </div>
   </div>
 </template>
@@ -65,6 +62,7 @@ export default {
 }
 
 .content {
+  user-select: all;
   width: 100%;
   overflow-x: scroll;
   height: fit-content;
@@ -85,6 +83,7 @@ export default {
   white-space: pre;
 }
 
-.content::-webkit-scrollbar {display:none}
-
+.content::-webkit-scrollbar {
+  display: none
+}
 </style>

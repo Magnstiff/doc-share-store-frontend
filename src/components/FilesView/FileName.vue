@@ -1,12 +1,41 @@
 <script>
 import {
   GithubOutlined,
-  FolderOutlined, SoundOutlined, FileExcelOutlined, FileWordOutlined, FilePptOutlined, FileTextOutlined, FilePdfOutlined, FileZipOutlined, FileImageOutlined, FileGifOutlined, AndroidOutlined, WindowsOutlined, VideoCameraOutlined, FileUnknownOutlined
+  FolderOutlined,
+  SoundOutlined,
+  FileExcelOutlined,
+  FileWordOutlined,
+  FilePptOutlined,
+  FileTextOutlined,
+  FilePdfOutlined,
+  FileZipOutlined,
+  FileImageOutlined,
+  FileGifOutlined,
+  AndroidOutlined,
+  WindowsOutlined,
+  VideoCameraOutlined,
+  FileUnknownOutlined
 } from '@ant-design/icons-vue'
 
 export default {
   name: 'FileName',
-  components: { GithubOutlined, FolderOutlined, SoundOutlined, FileExcelOutlined, FileWordOutlined, FilePptOutlined, FileTextOutlined, FilePdfOutlined, FileZipOutlined, FileImageOutlined, FileGifOutlined, AndroidOutlined, WindowsOutlined, VideoCameraOutlined, FileUnknownOutlined },
+  components: {
+    GithubOutlined,
+    FolderOutlined,
+    SoundOutlined,
+    FileExcelOutlined,
+    FileWordOutlined,
+    FilePptOutlined,
+    FileTextOutlined,
+    FilePdfOutlined,
+    FileZipOutlined,
+    FileImageOutlined,
+    FileGifOutlined,
+    AndroidOutlined,
+    WindowsOutlined,
+    VideoCameraOutlined,
+    FileUnknownOutlined
+  },
   props: {
     fileName: {
       type: String,

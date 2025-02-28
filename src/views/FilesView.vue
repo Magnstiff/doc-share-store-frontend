@@ -103,7 +103,7 @@ export default {
     downloadFile(target) {
       const paths = target.map(item => this.filesData.find(file => file.fileName === item))
       this.$store.dispatch('downloadFile', { paths: paths, basePath: this.currentPath })
-      // this.$router.push('/download')
+      this.$router.push('/download')
     },
     // 上传文件
     uploadFile(event) {
