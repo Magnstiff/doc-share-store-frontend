@@ -16,16 +16,14 @@
     "axios": "^1.5.0",
     "file-saver": "^2.0.5",
     "jszip": "^3.10.1",
-    "prettier": "^3.5.2",
     "uuid": "^11.1.0",
     "vue": "^3.3.4",
-    "vue-pdf-embed": "^1.1.6",
     "vue-router": "^4.2.4",
-    "vue3-pdfjs": "^0.0.1",
     "vuex": "^4.1.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.2.1",
+    "prettier": "^3.5.2",
     "save-dev": "^0.0.1-security",
     "vite": "^6.2.0"
   },
