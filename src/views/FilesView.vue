@@ -34,7 +34,8 @@ export default {
       curFileName: '',
       selectedRowKeys: [],
       filesData: [],
-      currentPath: '/'
+      currentPath: '/',
+      searchValue: ''
     }
   },
   methods: {
@@ -49,6 +50,7 @@ export default {
     doubleClick(val) {
       if (val.isFolder) {
         this.currentPath = this.currentPath + val.fileName + '/'
+        this.getFileList()
         return
       }
       this.previewFile(val.fileName)
@@ -77,6 +79,7 @@ export default {
       let currentPath = this.currentPath.substring(0, this.currentPath.length - 1)
       currentPath = currentPath.substring(0, currentPath.lastIndexOf('/') + 1)
       this.currentPath = currentPath
+      this.getFileList()
     },
     // 跳转到指定路径
     goToTargetPath(index) {
@@ -89,6 +92,7 @@ export default {
         currentPath = currentPath + this.currentPathList[i] + '/'
       }
       this.currentPath = currentPath
+      this.getFileList()
     },
     // 预览文件
     previewFile(fileName) {
@@ -112,6 +116,30 @@ export default {
         this.$router.push('/download')
       })
     },
+    // 搜索文件
+    onSearch() {
+      if (this.searchValue === '') {
+        this.getFileList()
+        return
+      }
+      this.selectedRowKeys = []
+      this.currentPath = '/'
+      this.tableLoading = true
+      this.$axios.get('/search?name=' + this.searchValue).then(res => {
+        // 按照文件夹在上，文件在下的顺序排列，然后按照文件名排序
+        res.data.sort((a, b) => {
+          if (a.isFolder === b.isFolder) {
+            return a.fileName.localeCompare(b.fileName)
+          }
+          return a.isFolder ? -1 : 1
+        })
+        this.filesData = res.data
+      }).catch(() => {
+        show('error', '搜索文件失败，错误信息：' + err)
+      }).finally(() => {
+        this.tableLoading = false
+      })
+    }
   },
   mounted() {
     this.getFileList()
@@ -121,11 +149,6 @@ export default {
       return this.currentPath.split('/').filter(item => item !== '')
     }
   },
-  watch: {
-    currentPath() {
-      this.getFileList()
-    }
-  }
 }
 </script>
 
@@ -139,6 +162,8 @@ export default {
       </a-button>
       <a-button type="default" class="opera-button" @click="uploadFile">上传</a-button>
       <a-button type="default" class="opera-button" @click="getFileList">刷新</a-button>
+      <a-input-search v-model:value="searchValue" placeholder="搜索文件" enter-button="给我搜" size="large" @search="onSearch"
+        style="width: 300px;" class="opera-button" />
     </a-row>
     <a-row class="main-bread">
       <a-button type="link" v-if="currentPath !== '/'" @click="goBack">返回上一级</a-button>
