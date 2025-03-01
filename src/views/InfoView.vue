@@ -38,7 +38,7 @@ export default {
       this.getSystemInfo()
     }, 500);
   },
-  beforeDestroy() {
+  beforeUnmount() {
     clearInterval(this.interval)
   }
 }
