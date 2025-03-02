@@ -1,12 +1,12 @@
 <script>
-import { HomeOutlined, DownloadOutlined, EyeOutlined } from '@ant-design/icons-vue'
+import { HomeOutlined, DownloadOutlined, EyeOutlined, LockOutlined, UnlockOutlined } from '@ant-design/icons-vue'
 import FileName from '../components/FilesView/FileName.vue'
 import show from "../components/notification.js"
 
 export default {
   name: 'FilesView',
   components: {
-    HomeOutlined, FileName, DownloadOutlined, EyeOutlined
+    HomeOutlined, FileName, DownloadOutlined, EyeOutlined, LockOutlined, UnlockOutlined
   },
   inject: ['$axios'],
   data() {
@@ -35,7 +35,11 @@ export default {
       selectedRowKeys: [],
       filesData: [],
       currentPath: '/',
-      searchValue: ''
+      searchValue: '',
+      // modal
+      inputPasswordOpen: false,
+      password: '',
+      modalCallback: null,
     }
   },
   methods: {
@@ -96,6 +100,11 @@ export default {
     },
     // 预览文件
     previewFile(fileName) {
+      const hasEncrypt = this.filesData.find(file => file.fileName === fileName).encrypt
+      if (hasEncrypt) {
+        show('error', '加密文件无法预览，请解密后再操作')
+        return
+      }
       this.$router.push({
         name: 'preview',
         query: {
@@ -105,6 +114,11 @@ export default {
     },
     // 下载文件
     downloadFile(target) {
+      const hasEncrypt = target.some(item => this.filesData.find(file => file.fileName === item).encrypt)
+      if (hasEncrypt) {
+        show('error', '加密文件无法下载，请解密后再操作')
+        return
+      }
       const paths = target.map(item => this.filesData.find(file => file.fileName === item))
       this.$store.dispatch('downloadFile', { paths: paths, basePath: this.currentPath })
       this.$router.push('/download')
@@ -139,7 +153,21 @@ export default {
       }).finally(() => {
         this.tableLoading = false
       })
-    }
+    },
+    // 加密文件
+    encryptFile(target) {
+      this.inputPasswordOpen = true
+      this.modalCallback = () => {
+        this.$axios.get(`/encrypt?filePath=${this.currentPath + target}&password=${this.password}`).then((res) => {
+          show('加密信息', res.data)
+          this.getFileList()
+        }).catch(() => {
+          show('error', '加密失败，错误信息：' + err)
+        })
+        this.inputPasswordOpen = false
+        this.password = ''
+      }
+    },
   },
   mounted() {
     this.getFileList()
@@ -192,6 +220,10 @@ export default {
           <FileName v-if="column.title === '文件名'" :file-name="record.fileName" :is-folder="record.isFolder" />
           <span v-else-if="column.title === '文件大小'">{{ record.fileSize }}</span>
           <template v-else-if="column.title === '操作'">
+            <UnlockOutlined class="opera-icons" title="未加密" v-if="!record.encrypt && !record.isFolder"
+              style="color: green;" @click.prevent="encryptFile(record.fileName)" />
+            <LockOutlined class="opera-icons" title="解密" v-if="record.encrypt && !record.isFolder" style="color: red;"
+              @click.prevent="encryptFile(record.fileName)" />
             <DownloadOutlined class="opera-icons" title="下载" @click.prevent="downloadFile([record.fileName])" />
             <EyeOutlined class="opera-icons" title="预览" @click.prevent="previewFile(record.fileName)"
               v-if="!record.isFolder" />
@@ -200,6 +232,9 @@ export default {
       </a-table>
     </a-row>
   </a-row>
+  <a-modal v-model:open="inputPasswordOpen" title="输入密码" @ok="modalCallback">
+    <a-input v-model:value="password" placeholder="请输入密码" />
+  </a-modal>
 </template>
 
 <style scoped>
