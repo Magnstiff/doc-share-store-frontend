@@ -1,24 +1,27 @@
 <script>
-
 export default {
   name: 'TxtViewer',
   props: ['url'],
   inject: ['$axios'],
   data() {
     return {
-      content: ''
+      content: '',
     }
   },
   beforeMount() {
-    this.$axios.get(this.url).then(res => {
+    this.$axios.get(this.url).then((res) => {
       this.content = res.data
     })
   },
   computed: {
     contentArray() {
-      return this.content.split('\n').slice(0, -1)
-    }
-  }
+      if (this.content.split) {
+        console.log(this.content)
+        return this.content.split('\n')
+      }
+      return []
+    },
+  },
 }
 </script>
 
@@ -84,6 +87,6 @@ export default {
 }
 
 .content::-webkit-scrollbar {
-  display: none
+  display: none;
 }
 </style>
