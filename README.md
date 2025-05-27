@@ -1,29 +1,18 @@
-# doc-store
+# xnas frontend
 
-This template should help get you started developing with Vue 3 in Vite.
+## install
 
-## Recommended IDE Setup
-
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vitejs.dev/config/).
-
-## Project Setup
-
-```sh
-npm install
+```bash
+git clone git@github.com:Magnstiff/doc-share-store-frontend.git
+cd doc-share-store-frontend
+npm install / yarn install
+npm run vue
 ```
 
-### Compile and Hot-Reload for Development
+## start to use
 
-```sh
-npm run dev
-```
+go localhost to see ui
 
-### Compile and Minify for Production
+## feature
 
-```sh
-npm run build
-```
+![alt text](image.png)
