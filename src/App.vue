@@ -10,14 +10,14 @@ export default {
   },
   provide() {
     return {
-      downloadInfo: computed(() => this.downloadInfo)
+      downloadInfo: computed(() => this.downloadInfo),
     }
-  }
+  },
 }
 </script>
 
 <template>
-  <a-layout style="min-height: 100vh;max-height: 100vh">
+  <a-layout style="min-height: 100vh; max-height: 100vh">
     <LayoutsiderBuild />
     <a-layout style="max-height: 100vh">
       <a-layout-content>
@@ -27,7 +27,7 @@ export default {
   </a-layout>
 </template>
 
-<style>
+<style scoped>
 * {
   user-select: none;
   padding: 0;
